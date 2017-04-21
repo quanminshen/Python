@@ -1,0 +1,8 @@
+# ignore files
+*.csv
+*.zip
+*.tar
+*.7z
+*.idea
+Kaggle/Facial_Keypoints_Detection/models
+Kaggle/Facial_Keypoints_Detection/data
