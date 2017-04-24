@@ -452,9 +452,8 @@ def train_specialist(spec_setting):
 
     # Calculate some of the training hyperparameters based on the specialist and available data
     max_epochs = int(1e7 / y.shape[0])
-    # max_epochs = 1
+    max_epochs = 20000
     num_keypoints = y.shape[1]
-    test = 5
 
     # Note training time start
     spec_start = time.time()

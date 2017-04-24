@@ -454,7 +454,7 @@ def train_specialist(spec_setting):
     max_epochs = int(1e7 / y.shape[0])
     # max_epochs = 1
     num_keypoints = y.shape[1]
-    test = 5
+    test = 11
 
     # Note training time start
     spec_start = time.time()
