@@ -92,7 +92,7 @@ def load2d(test = False, cols = None):
 
 
 # Predefined parameters
-batch_size = 36
+batch_size = 100
 every_epoch_to_log = 5
 
 root_location = FROOT + "/models/"
@@ -452,7 +452,7 @@ def train_specialist(spec_setting):
 
     # Calculate some of the training hyperparameters based on the specialist and available data
     max_epochs = int(1e7 / y.shape[0])
-    max_epochs = 20000
+    max_epochs = 300
     num_keypoints = y.shape[1]
 
     # Note training time start
@@ -470,7 +470,8 @@ def train_specialist(spec_setting):
         image, label = tf.train.slice_input_producer(
             [input_images, input_labels], num_epochs=max_epochs)
         label = tf.cast(label, tf.float32)
-        images, labels = tf.train.batch([image, label], batch_size=batch_size)
+        images, labels = tf.train.batch([image, label], batch_size=batch_size,
+                                        allow_smaller_final_batch=True)
         current_epoch = tf.Variable(0)  # count the number of epochs
 
         # Model parameters.
@@ -511,12 +512,18 @@ def train_specialist(spec_setting):
         try:
             step = 0
             while not coord.should_stop():
+                current_epoch = (step * batch_size) / y.shape[0]
                 _, loss_value = sess.run([optimizer, loss], feed_dict={is_training: True})
                 if step % 100 == 0:
                     print('Step {}: loss = {:.8f} time: {}'.format(step, loss_value, get_time_hhmmss(spec_start)))
                     summary_str = sess.run(summary, feed_dict={is_training: False})
                     summary_writer.add_summary(summary_str, step)
                     summary_writer.flush()
+
+                # Save a checkpoint periodically.
+                if (step + 1) % 1000 == 0:
+                    print('Saving')
+                    saver.save(sess, model_path(spec_name))
                 step += 1
         except tf.errors.OutOfRangeError:
             # Save model weights for future use.
